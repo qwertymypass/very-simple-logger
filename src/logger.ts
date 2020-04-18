@@ -5,12 +5,6 @@ type ILevel = 'info' | 'debug' | 'silent';
 type IMessage = string | number;
 type ILoggerFunction = (message: IMessage, params?: object) => void;
 
-interface IOptions {
-  type?: IType;
-  level?: ILevel;
-  colorize?: boolean;
-}
-
 export default class Logger {
   private readonly EOL = os.EOL;
   private type: IType;
@@ -35,13 +29,6 @@ export default class Logger {
 
   public setColorize(colorize: boolean): Logger {
     this.colorize = colorize;
-    return this;
-  }
-
-  public setOptions(options: IOptions): Logger {
-    this.level = (options && options.level) || this.level;
-    this.type = (options && options.type) || this.type;
-    this.colorize = (options && options.colorize) || this.colorize;
     return this;
   }
 
