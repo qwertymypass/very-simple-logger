@@ -1,8 +1,9 @@
 import os from 'os';
 
-type ILoggerFunction = (message: string, params?: object) => void;
 type IType = 'simple' | 'json';
 type ILevel = 'info' | 'debug' | 'silent';
+type IMessage = string | number;
+type ILoggerFunction = (message: IMessage, params?: object) => void;
 
 interface IOptions {
   type?: IType;
@@ -11,10 +12,10 @@ interface IOptions {
 }
 
 export default class Logger {
+  private readonly EOL = os.EOL;
   private type: IType;
   private level: ILevel;
   private colorize: boolean;
-  private EOL = os.EOL;
 
   constructor() {
     this.type = 'simple';
@@ -22,22 +23,26 @@ export default class Logger {
     this.colorize = true;
   }
 
-  public setType(type: IType): void {
+  public setType(type: IType): Logger {
     this.type = type;
+    return this;
   }
 
-  public setLevel(level: ILevel): void {
+  public setLevel(level: ILevel): Logger {
     this.level = level;
+    return this;
   }
 
-  public setColorize(colorize: boolean): void {
+  public setColorize(colorize: boolean): Logger {
     this.colorize = colorize;
+    return this;
   }
 
-  public setOptions(options: IOptions): void {
+  public setOptions(options: IOptions): Logger {
     this.level = (options && options.level) || this.level;
     this.type = (options && options.type) || this.type;
     this.colorize = (options && options.colorize) || this.colorize;
+    return this;
   }
 
   public debug: ILoggerFunction = (message, params) => this.checkLevel('debug') && this.print('debug', message, params);
@@ -57,7 +62,7 @@ export default class Logger {
     return true;
   }
 
-  private print(level: string, message: string, params: object = {}): void {
+  private print(level: string, message: IMessage, params: object = {}): void {
     const timestamp = new Date().toISOString();
 
     switch (this.type) {
@@ -68,12 +73,12 @@ export default class Logger {
     }
   }
 
-  private jsonLog(level: string, message: string, params: object, timestamp: string): void {
+  private jsonLog(level: string, message: IMessage, params: object, timestamp: string): void {
     const msg = JSON.stringify({ timestamp, level, message, params: { ...params } });
     this.toConsole(msg, level);
   }
 
-  private simpleLog(level: string, message: string, params: object = {}, timestamp: string): void {
+  private simpleLog(level: string, message: IMessage, params: object = {}, timestamp: string): void {
     const arrayParams = Object.keys(params).map(key => params[key] && `${key} -> ${params[key]}`);
     const stringParams = arrayParams.length ? `params: ${arrayParams.join(' | ')}` : '';
     const repeatSpace = ' '.repeat(7 - level.length);

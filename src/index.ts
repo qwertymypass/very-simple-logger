@@ -1,7 +1,3 @@
-import ConsoleLogger from './singl';
-const logger = new ConsoleLogger();
-logger.setColorize(true);
-logger.setType('simple');
+import Logger from './logger';
 
-export default logger;
-module.exports = logger;
+export = new Logger();
