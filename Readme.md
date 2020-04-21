@@ -8,6 +8,11 @@ Has three level for output: **info, debug, silent**
 
 Available types: **simple | json**
 Available levels: **info | debug | silent**
+Available times: **iso | local**
+
+IL = *info level*
+EL = *error level*
+logger methods: **debug (IL) | info (IL) | warn (EL) | error (EL)**
 
 ```
 import logger from './index';
@@ -16,6 +21,7 @@ logger
   .setType('json')
   .setLevel('info')
   .setColorize(true);
+  .setTime('iso');
 ```
 Arguments for call the logger:
   - message: string | number
@@ -31,5 +37,5 @@ JSON Ouput
 ```
 Simple Output
 ```
-[2020-04-18T22:00:34.215Z] [info]   Call info logger    params: hello -> world | milky -> way
+2020-04-18T22:00:34.215Z [info]   Call info logger    params: hello -> world | milky -> way
 ```

@@ -1,20 +1,32 @@
 import os from 'os';
 
-type IType = 'simple' | 'json';
-type ILevel = 'info' | 'debug' | 'silent';
-type IMessage = string | number;
-type ILoggerFunction = (message: IMessage, params?: object) => void;
+export type IType = 'simple' | 'json';
+export type ILevel = 'info' | 'debug' | 'silent';
+export type IMessage = string | number;
+export type ITime = 'iso' | 'local';
+export type ILoggerFunction = (message: IMessage, params?: object) => void;
 
+export interface IOptions {
+  type?: IType;
+  level?: ILevel;
+  colorize?: boolean;
+  separator?: string;
+  time?: ITime;
+}
 export default class Logger {
   private readonly EOL = os.EOL;
   private type: IType;
   private level: ILevel;
   private colorize: boolean;
+  private separator: string;
+  private time: ITime;
 
   constructor() {
     this.type = 'simple';
     this.level = process.env.NODE_ENV === 'development' ? 'debug' : 'info';
     this.colorize = true;
+    this.separator = '|';
+    this.time = 'iso';
   }
 
   public setType(type: IType): Logger {
@@ -29,6 +41,25 @@ export default class Logger {
 
   public setColorize(colorize: boolean): Logger {
     this.colorize = colorize;
+    return this;
+  }
+
+  public setSeparator(separator: string): Logger {
+    this.separator = separator;
+    return this;
+  }
+
+  public setTime(typeTime: ITime): Logger {
+    this.time = typeTime;
+    return this;
+  }
+
+  public setOptions(options: IOptions): Logger {
+    this.level = (options && options.level) || this.level;
+    this.type = (options && options.type) || this.type;
+    this.colorize = (options && options.colorize) || this.colorize;
+    this.separator = (options && options.separator) || this.separator;
+    this.time = (options && options.time) || this.time;
     return this;
   }
 
@@ -50,7 +81,7 @@ export default class Logger {
   }
 
   private print(level: string, message: IMessage, params: object = {}): void {
-    const timestamp = new Date().toISOString();
+    const timestamp = this.getTime();
 
     switch (this.type) {
       case 'json':
@@ -61,20 +92,26 @@ export default class Logger {
   }
 
   private jsonLog(level: string, message: IMessage, params: object, timestamp: string): void {
-    const msg = JSON.stringify({ timestamp, level, message, params: { ...params } });
+    const payload = { timestamp, level, message, params };
+
+    if (!Object.keys(params).length) {
+      delete payload.params;
+    }
+
+    const msg = JSON.stringify(payload);
     this.toConsole(msg, level);
   }
 
   private simpleLog(level: string, message: IMessage, params: object = {}, timestamp: string): void {
     const arrayParams = Object.keys(params).map(key => params[key] && `${key} -> ${params[key]}`);
-    const stringParams = arrayParams.length ? `params: ${arrayParams.join(' | ')}` : '';
+    const stringParams = arrayParams.join(` ${this.separator} `);
     const repeatSpace = ' '.repeat(7 - level.length);
 
     if (this.colorize === true) {
       level = this.getWithColor(level);
     }
 
-    const msg = `[${timestamp}] [${level}]${repeatSpace}${message}\t${stringParams}`;
+    const msg = `${timestamp} [${level}]${repeatSpace}${message}\t${stringParams}`;
     this.toConsole(msg, level);
   }
 
@@ -83,6 +120,16 @@ export default class Logger {
       process.stdout ? process.stdout.write(`${message}${this.EOL}`) : console.log(message);
     } else {
       process.stderr ? process.stderr.write(`${message}${this.EOL}`) : console.error(message);
+    }
+  }
+
+  private getTime() {
+    switch (this.time) {
+      case 'local':
+        return new Date().toLocaleString();
+      case 'iso':
+      default:
+        return new Date().toISOString();
     }
   }
 
