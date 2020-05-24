@@ -1,4 +1,4 @@
-### Very Simple Logger for Node.js
+### Very Simple Logger
 
 For output to the console.
 Lightweight and no dependency.
@@ -10,11 +10,9 @@ Available types: **simple | json**
 Available levels: **info | debug | silent**
 Available times: **iso | local**
 
-IL = *info level*
-EL = *error level*
 logger methods: **debug (IL) | info (IL) | warn (EL) | error (EL)**
 
-```
+```javascript
 import logger from './index';
 
 logger
@@ -25,14 +23,14 @@ logger
 ```
 Arguments for call the logger:
   - message: string | number
-  - params: [key: string]: string
+  - params: object
 
 Code
-```
+```javascript
 logger.info('Call info logger', { hello: 'world', milky: 'way'})
 ```
 JSON Ouput
-```
+```json
 {"timestamp":"2020-04-18T22:00:53.118Z","level":"info","message":"Call info logger","params":{"hello":"world","milky":"way"}}
 ```
 Simple Output

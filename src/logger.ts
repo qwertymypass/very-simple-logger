@@ -13,6 +13,7 @@ export interface IOptions {
   separator?: string;
   time?: ITime;
 }
+
 export default class Logger {
   private readonly EOL = os.EOL;
   private type: IType;
@@ -117,7 +118,7 @@ export default class Logger {
 
   private toConsole(message: string, level: string): void {
     if (['info', 'debug'].includes(level)) {
-      process.stdout ? process.stdout.write(`${message}${this.EOL}`) : console.log(message);
+      process.stdout ? process.stdout.write(`${message}${this.EOL}`) : console.info(message);
     } else {
       process.stderr ? process.stderr.write(`${message}${this.EOL}`) : console.error(message);
     }
